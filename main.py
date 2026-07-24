@@ -11,6 +11,7 @@ from __future__ import annotations
 import html
 import math
 import re
+import unicodedata
 from datetime import datetime, timezone
 from typing import Any
 
@@ -401,9 +402,18 @@ def score_label(score: float) -> str:
 
 
 def artist_name_matches(result_artist: str, target_artist: str) -> bool:
-    result = re.sub(r"[^a-z0-9가-힣]", "", result_artist.casefold())
-    target = re.sub(r"[^a-z0-9가-힣]", "", target_artist.casefold())
-    return result == target or target in result or result in target
+    """정확 일치만 허용한다 (억양 부호는 무시).
+
+    이전에는 target이 result에 부분 문자열로 포함되면 매칭시켰는데,
+    "Jennie" 같은 짧은 솔로 아티스트명이 "Jennie-P" 같은 전혀 다른
+    아티스트명 안에 우연히 포함되면서 오매칭이 발생했다 (실사례로 발견됨).
+    """
+    def normalize(name: str) -> str:
+        decomposed = unicodedata.normalize("NFKD", name)
+        without_accents = "".join(ch for ch in decomposed if not unicodedata.combining(ch))
+        return re.sub(r"[^a-z0-9가-힣]", "", without_accents.casefold())
+
+    return normalize(result_artist) == normalize(target_artist)
 
 
 # =========================================================

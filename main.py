@@ -77,10 +77,12 @@ st.markdown(
             --card-border: rgba(255,255,255,.08);
             --ink: #f2f2f5;
             --muted: #8c8c99;
-            --accent1: #fa233b;
-            --accent2: #fb5c74;
-            --accent3: #ff9500;
+            --accent1: #ff2d55;
+            --accent2: #ff5f8f;
+            --accent3: #ffaa00;
             --spotify: #1db954;
+            --sidebar-bg: #f5f5f7;
+            --sidebar-ink: #111114;
         }
 
         html, body, [class*="css"] {
@@ -91,18 +93,28 @@ st.markdown(
 
         .stApp {
             background:
-                radial-gradient(circle at 12% 0%, rgba(250,35,59,.16), transparent 32%),
-                radial-gradient(circle at 88% 6%, rgba(255,149,0,.12), transparent 30%),
+                radial-gradient(circle at 12% 0%, rgba(255,45,85,.22), transparent 34%),
+                radial-gradient(circle at 88% 6%, rgba(255,170,0,.18), transparent 32%),
+                radial-gradient(circle at 50% 100%, rgba(255,95,143,.10), transparent 40%),
                 var(--bg);
             color: var(--ink);
         }
 
         .block-container { max-width: 1440px; padding-top: 1.6rem; padding-bottom: 3rem; }
 
+        /* ---------- 사이드바: 밝은 배경 + 검정 텍스트 (아이튠즈 클래식 톤) ---------- */
         [data-testid="stSidebar"] {
-            background: #0e0e13;
-            border-right: 1px solid var(--card-border);
+            background: var(--sidebar-bg);
+            border-right: 1px solid rgba(0,0,0,.08);
         }
+        [data-testid="stSidebar"] * {
+            color: var(--sidebar-ink) !important;
+        }
+        [data-testid="stSidebar"] .stSelectbox [data-baseweb="select"] {
+            background: #ffffff;
+            border-radius: 10px;
+        }
+        [data-testid="stSidebar"] hr { border-color: rgba(0,0,0,.12) !important; }
 
         .mono { font-family: ui-monospace, "SF Mono", "Menlo", monospace; }
 
@@ -111,20 +123,20 @@ st.markdown(
             display: inline-flex;
             align-items: flex-end;
             gap: 3px;
-            height: 22px;
-            margin-left: 12px;
+            height: 18px;
+            margin-left: 10px;
             vertical-align: middle;
         }
         .eq-bars span {
             display: block;
-            width: 4px;
+            width: 3px;
             border-radius: 2px;
             background: linear-gradient(180deg, var(--accent3), var(--accent1));
             animation: eq-bounce ease-in-out infinite;
         }
         @keyframes eq-bounce {
-            0%, 100% { height: 5px; }
-            50% { height: 20px; }
+            0%, 100% { height: 4px; }
+            50% { height: 16px; }
         }
 
         .hero {
@@ -135,17 +147,19 @@ st.markdown(
             border-radius: 26px;
             border: 1px solid var(--card-border);
             background:
-                linear-gradient(120deg, rgba(250,35,59,.20), rgba(255,149,0,.10)),
+                linear-gradient(120deg, rgba(255,45,85,.28), rgba(255,170,0,.16)),
                 var(--card);
+            box-shadow: 0 0 60px rgba(255,45,85,.10);
         }
         .eyebrow {
-            color: var(--accent2);
-            font-size: .74rem; font-weight: 800; letter-spacing: .2em;
-            text-transform: uppercase; margin-bottom: 10px;
+            background: linear-gradient(90deg, #fff, var(--accent2) 60%, var(--accent3));
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            font-size: 2.4rem; font-weight: 900; letter-spacing: -.02em;
+            text-transform: uppercase; margin-bottom: 10px; line-height: 1.1;
         }
         .hero-title {
-            font-size: clamp(2.1rem, 4vw, 3.6rem);
-            font-weight: 900; letter-spacing: -.03em; margin: 0;
+            font-size: clamp(1.05rem, 2vw, 1.8rem);
+            font-weight: 800; letter-spacing: -.02em; margin: 0;
             color: #fff;
         }
         .hero-subtitle { color: var(--muted); margin-top: 12px; max-width: 820px; line-height: 1.6; }

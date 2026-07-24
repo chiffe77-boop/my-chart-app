@@ -1195,7 +1195,21 @@ with korean_tab:
 
 
 # =========================================================
-# 18b. AI 채팅 (Upstage Solar)
+# 19. FOOTER
+# =========================================================
+
+st.markdown("---")
+st.caption(
+    "K-POP Comeback Radar v2 · Apple iTunes Search API · YouTube Data API · "
+    "Mediastack · Naver Search API · Upstage Solar · "
+    "판매량/수익 예측은 공개 보도자료 기반 실측치 + 신호 기반 추정 모델의 결과이며, "
+    "실제 정산과 다를 수 있는 비공식 학습용 지표입니다."
+)
+
+
+# =========================================================
+# 20. AI 채팅 (Upstage Solar) — st.chat_input은 항상 화면 맨 아래에
+# 고정되는 위젯이라, 다른 콘텐츠와 겹쳐 보이지 않도록 맨 마지막에 배치
 # =========================================================
 
 st.markdown("---")
@@ -1241,16 +1255,3 @@ else:
         if st.button("대화 초기화", key=f"reset_{selected_key}"):
             st.session_state[session_key] = []
             st.rerun()
-
-
-# =========================================================
-# 19. FOOTER
-# =========================================================
-
-st.markdown("---")
-st.caption(
-    "K-POP Comeback Radar v2 · Apple iTunes Search API · YouTube Data API · "
-    "Mediastack · Naver Search API · Upstage Solar · "
-    "판매량/수익 예측은 공개 보도자료 기반 실측치 + 신호 기반 추정 모델의 결과이며, "
-    "실제 정산과 다를 수 있는 비공식 학습용 지표입니다."
-)

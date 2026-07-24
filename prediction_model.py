@@ -32,7 +32,7 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from typing import Literal
 
-from spotify_charts import has_chart_data, best_rank_ever
+from spotify_charts import has_chart_data, best_rank_ever, has_artist_yearly_data
 
 # =========================================================
 # 1. 그룹 기준선(baseline) — 공개 리포트 + 확보한 실측치 기반 앵커
@@ -82,10 +82,11 @@ CONFIDENCE_HAS_SEED = {
     "ive", "twice", "stray_kids",
 }
 
-# 피지컬 판매량 실측이 없어도, 스포티파이 글로벌 앨범 차트 실측(spotify_charts.py)이
-# 있으면 "완전 추정(low)"보다는 한 단계 위 신뢰도로 취급한다.
+# 피지컬 판매량 실측이 없어도, 스포티파이 글로벌 앨범 차트 실측 또는 아티스트
+# 연도별 인기도 실측(spotify_charts.py)이 있으면 "완전 추정(low)"보다는 한 단계 위로 취급한다.
 CONFIDENCE_HAS_STREAM_SEED = {
-    aid for aid in GROUP_BASELINE_MANJANG if has_chart_data(aid)
+    aid for aid in GROUP_BASELINE_MANJANG
+    if has_chart_data(aid) or has_artist_yearly_data(aid)
 } - CONFIDENCE_HAS_SEED
 
 
@@ -155,8 +156,8 @@ def predict_first_week_sales(artist_id: str, signals: SignalInputs) -> SalesPred
         # 데이터베이스에 없는 신규/소규모 아티스트는 극도로 보수적인 최소 추정만 제공
         baseline = 5.0
         confidence: Literal["high", "medium", "low"] = "low"
-    elif artist_id in CONFIDENCE_HAS_SEED and has_chart_data(artist_id):
-        # 피지컬 판매량 실측 + 스포티파이 글로벌 차트 실측이 둘 다 있는 경우
+    elif artist_id in CONFIDENCE_HAS_SEED and (has_chart_data(artist_id) or has_artist_yearly_data(artist_id)):
+        # 피지컬 판매량 실측 + 스포티파이 실측(앨범 차트 또는 연도별 인기도)이 둘 다 있는 경우
         confidence = "high"
     elif artist_id in CONFIDENCE_HAS_SEED or artist_id in CONFIDENCE_HAS_STREAM_SEED:
         confidence = "medium"

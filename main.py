@@ -74,21 +74,16 @@ st.markdown(
     """
     <style>
         :root {
-            --bg: #ffffff;
+            --page-bg: #dde1ee;
             --card: #ffffff;
-            --card-border: rgba(17,17,20,.10);
-            --ink: #111114;
-            --muted: #5a5a63;
-            --accent1: #ff2d55;
-            --accent2: #ff5f8f;
-            --accent3: #ffaa00;
+            --card-border: #c8cee0;
+            --ink: #14141a;
+            --muted: #6f7386;
+            --accent-now: #ff5a36;
+            --accent-play: #4b3cff;
             --spotify: #1db954;
-            --sidebar-bg: #f5f5f7;
-            --sidebar-ink: #111114;
-            --purple1: #2d0a54;
-            --purple2: #5a189a;
-            --hero-ink: #ffffff;
-            --hero-muted: rgba(255,255,255,.78);
+            --sidebar-bg: #eef0f7;
+            --sidebar-ink: #14141a;
         }
 
         html, body, [class*="css"] {
@@ -97,140 +92,113 @@ st.markdown(
             -webkit-font-smoothing: antialiased;
         }
 
-        .stApp {
-            background:
-                radial-gradient(circle at 12% 0%, rgba(255,45,85,.05), transparent 34%),
-                radial-gradient(circle at 88% 6%, rgba(255,170,0,.05), transparent 32%),
-                var(--bg);
-            color: var(--ink);
-        }
+        .stApp { background: var(--page-bg); color: var(--ink); }
 
         .block-container { max-width: 1440px; padding-top: 1.6rem; padding-bottom: 3rem; }
 
-        /* ---------- 사이드바: 밝은 배경 + 검정 텍스트 (아이튠즈 클래식 톤) ---------- */
+        /* ---------- 사이드바: 옅은 라벤더 배경 + 블랙 텍스트 ---------- */
         [data-testid="stSidebar"] {
             background: var(--sidebar-bg);
-            border-right: 1px solid rgba(0,0,0,.08);
+            border-right: 1px solid var(--card-border);
         }
-        [data-testid="stSidebar"] * {
-            color: var(--sidebar-ink) !important;
-        }
+        [data-testid="stSidebar"] * { color: var(--sidebar-ink) !important; }
         [data-testid="stSidebar"] .stSelectbox [data-baseweb="select"] {
-            background: #ffffff;
-            border-radius: 10px;
+            background: #ffffff; border-radius: 10px; border: 1px solid var(--card-border);
         }
-        [data-testid="stSidebar"] hr { border-color: rgba(0,0,0,.12) !important; }
+        [data-testid="stSidebar"] hr { border-color: var(--card-border) !important; }
 
         .mono { font-family: ui-monospace, "SF Mono", "Menlo", monospace; }
 
         /* ---------- 시그니처: 이퀄라이저 바 ---------- */
         .eq-bars {
-            display: inline-flex;
-            align-items: flex-end;
-            gap: 3px;
-            height: 18px;
-            margin-left: 10px;
-            vertical-align: middle;
+            display: inline-flex; align-items: flex-end; gap: 3px;
+            height: 18px; margin-left: 10px; vertical-align: middle;
         }
         .eq-bars span {
-            display: block;
-            width: 3px;
-            border-radius: 2px;
-            background: linear-gradient(180deg, var(--accent3), var(--accent1));
+            display: block; width: 3px; border-radius: 2px;
+            background: var(--accent-now);
             animation: eq-bounce ease-in-out infinite;
         }
-        @keyframes eq-bounce {
-            0%, 100% { height: 4px; }
-            50% { height: 16px; }
-        }
+        @keyframes eq-bounce { 0%, 100% { height: 4px; } 50% { height: 16px; } }
 
-        /* ---------- 히어로: 짙은 보라 배경 유지, 텍스트는 밝은 톤 ---------- */
+        /* ---------- 히어로: 화이트 카드 + 얇은 테두리, veeps 스타일 ---------- */
         .hero {
             position: relative;
-            overflow: hidden;
-            padding: 34px 38px;
+            padding: 30px 36px;
             margin-bottom: 22px;
-            border-radius: 26px;
-            border: 1px solid rgba(255,255,255,.08);
-            background: linear-gradient(120deg, var(--purple1), var(--purple2) 70%, #7b2ff7);
-            box-shadow: 0 20px 50px rgba(45,10,84,.35);
+            border-radius: 16px;
+            border: 1px solid var(--card-border);
+            background: var(--card);
         }
         .eyebrow {
-            background: linear-gradient(90deg, #ffffff, var(--accent2) 55%, var(--accent3));
-            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            color: var(--ink);
             font-size: 2.4rem; font-weight: 900; letter-spacing: -.02em;
-            text-transform: uppercase; margin-bottom: 10px; line-height: 1.1;
+            text-transform: uppercase; margin-bottom: 6px; line-height: 1.1;
         }
         .hero-title {
             font-size: clamp(1.05rem, 2vw, 1.8rem);
-            font-weight: 800; letter-spacing: -.02em; margin: 0;
-            color: var(--hero-ink);
+            font-weight: 800; letter-spacing: -.01em; margin: 0;
+            color: var(--ink);
         }
-        .hero-subtitle { color: var(--hero-muted); margin-top: 12px; max-width: 820px; line-height: 1.6; }
+        .hero-subtitle { color: var(--muted); margin-top: 12px; max-width: 820px; line-height: 1.6; }
 
         .section-title {
-            font-size: 1.22rem; font-weight: 800; margin: 18px 0 12px;
+            font-size: 1.05rem; font-weight: 800; margin: 22px 0 12px;
             display: flex; align-items: center; gap: 8px;
+            text-transform: uppercase; letter-spacing: .04em;
         }
 
         .glass-card {
-            height: 100%; padding: 20px; border-radius: 18px;
+            height: 100%; padding: 20px; border-radius: 16px;
             background: var(--card); border: 1px solid var(--card-border);
-            box-shadow: 0 4px 18px rgba(17,17,20,.05);
         }
 
         .album-card {
             display: flex; gap: 18px; align-items: center; padding: 18px;
-            border-radius: 18px; background: var(--card); border: 1px solid var(--card-border);
-            margin-bottom: 14px; box-shadow: 0 4px 18px rgba(17,17,20,.05);
+            border-radius: 16px; background: var(--card); border: 1px solid var(--card-border);
+            margin-bottom: 14px;
         }
         .album-cover {
-            width: 112px; height: 112px; min-width: 112px; border-radius: 14px;
-            object-fit: cover; background: #eeeef2;
-            box-shadow: 0 10px 26px rgba(17,17,20,.18);
+            width: 104px; height: 104px; min-width: 104px; border-radius: 10px;
+            object-fit: cover; background: var(--sidebar-bg);
+            border: 1px solid var(--card-border);
         }
         .album-name { font-size: 1.08rem; font-weight: 800; margin: 6px 0; color: var(--ink); }
         .muted { color: var(--muted); font-size: .89rem; line-height: 1.55; }
 
         .score-card {
-            text-align: center; padding: 26px 18px; border-radius: 20px;
-            background: radial-gradient(circle at 50% 0%, rgba(255,45,85,.08), transparent 45%), var(--card);
-            border: 1px solid var(--card-border);
-            box-shadow: 0 4px 18px rgba(17,17,20,.05);
+            text-align: center; padding: 26px 18px; border-radius: 16px;
+            background: var(--card); border: 1px solid var(--card-border);
         }
         .score-number {
             font-family: ui-monospace, "SF Mono", monospace;
-            font-size: 3.6rem; font-weight: 800;
-            background: linear-gradient(90deg, var(--accent1), var(--accent3));
-            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            font-size: 3.6rem; font-weight: 900; color: var(--ink);
         }
 
         .news-card {
-            padding: 15px 16px; margin-bottom: 10px; border-radius: 15px;
+            padding: 15px 16px; margin-bottom: 10px; border-radius: 14px;
             background: var(--card); border: 1px solid var(--card-border);
-            box-shadow: 0 4px 18px rgba(17,17,20,.05);
         }
         .news-title { color: var(--ink); font-weight: 700; font-size: .95rem; text-decoration: none; }
-        .news-title:hover { color: var(--accent1); }
+        .news-title:hover { color: var(--accent-play); }
         .news-meta { color: var(--muted); font-size: .76rem; margin-top: 7px; }
 
         .badge {
             display: inline-block; padding: 4px 10px; border-radius: 999px;
-            font-size: .72rem; font-weight: 700; margin: 2px 4px 2px 0;
-            background: rgba(255,45,85,.10); border: 1px solid rgba(255,45,85,.30);
-            color: #c2114a;
+            font-size: .68rem; font-weight: 800; margin: 2px 4px 2px 0;
+            letter-spacing: .04em; text-transform: uppercase;
+            background: #ffffff; border: 1px solid var(--ink); color: var(--ink);
         }
         .badge-spotify {
-            background: rgba(29,185,84,.10); border: 1px solid rgba(29,185,84,.35); color: #17803d;
+            background: #ffffff; border: 1px solid var(--spotify); color: var(--spotify);
         }
         .badge-solo {
-            background: rgba(255,170,0,.14); border: 1px solid rgba(255,170,0,.40); color: #a35c00;
+            background: #ffffff; border: 1px solid var(--accent-now); color: var(--accent-now);
         }
 
         .revenue-band {
-            padding: 18px; border-radius: 16px; background: var(--card);
+            padding: 18px; border-radius: 14px; background: var(--card);
             border: 1px solid var(--card-border); text-align: center;
-            box-shadow: 0 4px 18px rgba(17,17,20,.05);
         }
         .revenue-band .val {
             font-family: ui-monospace, "SF Mono", monospace;
@@ -239,17 +207,44 @@ st.markdown(
         .revenue-band .lbl { color: var(--muted); font-size: .78rem; margin-top: 4px; }
 
         .verified-tag {
-            display: inline-block; padding: 3px 9px; border-radius: 8px;
-            background: rgba(29,185,84,.14); color: #16803c; font-size: .72rem; font-weight: 800;
+            display: inline-block; padding: 3px 9px; border-radius: 999px;
+            border: 1px solid var(--spotify); color: var(--spotify);
+            font-size: .68rem; font-weight: 800; letter-spacing: .03em; text-transform: uppercase;
         }
         .estimate-tag {
-            display: inline-block; padding: 3px 9px; border-radius: 8px;
-            background: rgba(255,170,0,.16); color: #a35c00; font-size: .72rem; font-weight: 800;
+            display: inline-block; padding: 3px 9px; border-radius: 999px;
+            border: 1px solid var(--accent-now); color: var(--accent-now);
+            font-size: .68rem; font-weight: 800; letter-spacing: .03em; text-transform: uppercase;
+        }
+
+        /* ---------- 스케줄 카드: 발매 이력을 veeps 일정 리스트 형태로 ---------- */
+        .schedule-card {
+            border-radius: 16px; border: 1px solid var(--card-border);
+            background: var(--card); overflow: hidden; margin-bottom: 14px;
+        }
+        .schedule-row {
+            display: flex; align-items: center; gap: 18px; padding: 16px 20px;
+            border-top: 1px solid var(--card-border);
+        }
+        .schedule-row:first-child { border-top: none; }
+        .schedule-date {
+            min-width: 64px; font-weight: 800; font-size: .82rem; color: var(--muted);
+            text-transform: uppercase; line-height: 1.3;
+        }
+        .schedule-date .now { color: var(--accent-now); }
+        .schedule-main { flex: 1; }
+        .schedule-title { font-weight: 800; font-size: 1rem; color: var(--ink); }
+        .schedule-sub { color: var(--muted); font-size: .82rem; margin-top: 2px; }
+        .schedule-play {
+            width: 34px; height: 34px; border-radius: 50%;
+            border: 1px solid var(--card-border); display: flex;
+            align-items: center; justify-content: center; text-decoration: none;
+            color: var(--accent-play); font-weight: 900; flex-shrink: 0;
         }
 
         [data-testid="stSidebar"] .stButton > button {
-            background: linear-gradient(90deg, var(--accent1), var(--accent3));
-            color: #fff !important; border: 0; border-radius: 12px; font-weight: 800;
+            background: var(--ink); color: #fff !important; border: 0;
+            border-radius: 10px; font-weight: 800;
         }
 
         hr { border-color: var(--card-border) !important; }
@@ -769,14 +764,14 @@ def render_cadence_section(cadence: dict[str, Any]) -> None:
     with cols[0]:
         st.markdown(
             f'<div class="glass-card"><div class="muted">평균 컴백 간격</div>'
-            f'<div class="mono" style="font-size:1.8rem;font-weight:800;color:#111114;">'
+            f'<div class="mono" style="font-size:1.8rem;font-weight:800;color:#14141a;">'
             f'{cadence["avg_gap_days"]:.0f}일</div></div>',
             unsafe_allow_html=True,
         )
     with cols[1]:
         st.markdown(
             f'<div class="glass-card"><div class="muted">최근 1년 발매 횟수</div>'
-            f'<div class="mono" style="font-size:1.8rem;font-weight:800;color:#111114;">'
+            f'<div class="mono" style="font-size:1.8rem;font-weight:800;color:#14141a;">'
             f'{cadence["release_count_last_year"]}회</div></div>',
             unsafe_allow_html=True,
         )
@@ -784,29 +779,58 @@ def render_cadence_section(cadence: dict[str, Any]) -> None:
         fastest = cadence["min_gap_days"]
         st.markdown(
             f'<div class="glass-card"><div class="muted">최단 컴백 간격</div>'
-            f'<div class="mono" style="font-size:1.8rem;font-weight:800;color:#111114;">'
+            f'<div class="mono" style="font-size:1.8rem;font-weight:800;color:#14141a;">'
             f'{fastest if fastest is not None else "-"}일</div></div>',
             unsafe_allow_html=True,
         )
 
-    timeline_df = pd.DataFrame(
-        [{"발매일": dt.strftime("%Y-%m-%d"), "포맷": classify_format(a.get("track_count", 0)),
-          "이름": a.get("name", "")} for dt, a in cadence["timeline"]]
-    )
+    st.markdown('<div style="height:16px;"></div>', unsafe_allow_html=True)
+
+    # ---- veeps 스타일 스케줄 카드: 최신 발매 순으로 최대 8개 ----
+    recent_first = list(reversed(cadence["timeline"]))[:8]
+    rows_html = []
+    for dt, album in recent_first:
+        age = (datetime.now(timezone.utc) - dt.astimezone(timezone.utc)).days
+        is_latest = age <= 60
+        date_label = (
+            f'<span class="now">NOW</span><br>{dt.strftime("%m.%d")}'
+            if is_latest else dt.strftime("%b<br>%d").upper()
+        )
+        fmt = classify_format(album.get("track_count", 0))
+        apple_url = escape_text(album.get("apple_url", ""))
+        play_html = (
+            f'<a class="schedule-play" href="{apple_url}" target="_blank" title="Apple Music에서 열기">▶</a>'
+            if apple_url else '<div class="schedule-play" style="opacity:.25;">▶</div>'
+        )
+        rows_html.append(
+            f'<div class="schedule-row">'
+            f'<div class="schedule-date">{date_label}</div>'
+            f'<div class="schedule-main">'
+            f'<div class="schedule-title">{escape_text(album.get("name",""))}</div>'
+            f'<div class="schedule-sub">{escape_text(fmt)} · {escape_text(album.get("track_count",0))}곡 · '
+            f'{escape_text(dt.strftime("%Y.%m.%d"))}</div>'
+            f'</div>{play_html}</div>'
+        )
+    st.markdown(f'<div class="schedule-card">{"".join(rows_html)}</div>', unsafe_allow_html=True)
+
     fmt_fig = px.bar(
         pd.DataFrame(
             [{"포맷": k, "횟수": v} for k, v in cadence["format_counts"].items()]
         ),
         x="포맷", y="횟수", color="포맷",
-        color_discrete_sequence=["#ff2d55", "#ff5f8f", "#ffaa00", "#5a5a63"],
+        color_discrete_sequence=["#ff5a36", "#4b3cff", "#14141a", "#a7acc4"],
     )
     fmt_fig.update_layout(
-        height=280, margin=dict(l=10, r=10, t=20, b=10),
+        height=260, margin=dict(l=10, r=10, t=20, b=10),
         paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)",
-        font=dict(color="#2b2b33"), showlegend=False,
+        font=dict(color="#14141a"), showlegend=False,
     )
-    st.plotly_chart(fmt_fig, use_container_width=True, config={"displayModeBar": False})
-    with st.expander("발매 타임라인 상세 보기"):
+    with st.expander("발매 포맷 분포 / 전체 타임라인 표 보기"):
+        st.plotly_chart(fmt_fig, use_container_width=True, config={"displayModeBar": False})
+        timeline_df = pd.DataFrame(
+            [{"발매일": dt.strftime("%Y-%m-%d"), "포맷": classify_format(a.get("track_count", 0)),
+              "이름": a.get("name", "")} for dt, a in cadence["timeline"]]
+        )
         st.dataframe(timeline_df, use_container_width=True, hide_index=True)
 
 
@@ -930,7 +954,7 @@ def render_album_card(artist_name: str, apple_data: dict[str, Any]) -> None:
     )
     link_tag = (
         f'<a href="{escape_text(apple_url)}" target="_blank" '
-        'style="color:#ff2d55;font-weight:700;">Apple Music에서 열기 ↗</a>'
+        'style="color:#4b3cff;font-weight:700;">Apple Music에서 열기 ↗</a>'
         if apple_url else ""
     )
     st.markdown(
@@ -1157,7 +1181,7 @@ with right:
     )
     radar_df = pd.DataFrame({"지표": list(components.keys()), "점수": list(components.values())})
     radar_fig = px.line_polar(radar_df, r="점수", theta="지표", line_close=True, range_r=[0, 100])
-    radar_fig.update_traces(fill="toself", line=dict(color="#ff2d55"))
+    radar_fig.update_traces(fill="toself", line=dict(color="#4b3cff"))
     radar_fig.update_layout(
         height=300, margin=dict(l=15, r=15, t=25, b=15),
         paper_bgcolor="rgba(0,0,0,0)",

@@ -25,6 +25,7 @@ from seed_sales import get_sales_records, has_verified_data
 from spotify_charts import get_chart_history, has_chart_data
 from prediction_model import (
     SignalInputs,
+    SalesPrediction,
     predict_first_week_sales,
     estimate_revenue_band,
     RevenueAssumptions,
@@ -553,6 +554,75 @@ def get_naver_news(query: str, client_id: str, client_secret: str) -> list[dict[
 
 
 # =========================================================
+# 7b. UPSTAGE SOLAR CHAT
+# =========================================================
+
+def build_artist_context(
+    artist_name: str,
+    apple_data: dict[str, Any],
+    score: float,
+    components: dict[str, float],
+    cadence: dict[str, Any],
+    prediction: "SalesPrediction | None",
+) -> str:
+    """Solar에게 넘길 '지금 화면에 있는 실데이터' 요약 컨텍스트."""
+    album = apple_data.get("latest_album", {})
+    lines = [
+        f"아티스트: {artist_name}",
+        f"최신 발매작: {album.get('name', '-')} ({format_date(album.get('release_date'))}, "
+        f"{album.get('album_type', '')}, {album.get('total_tracks', 0)}곡)",
+        f"Comeback Score: {score:.0f}/100 ({score_label(score)})",
+        "점수 세부 구성: " + ", ".join(f"{k} {v:.0f}" for k, v in components.items()),
+    ]
+    if cadence.get("avg_gap_days") is not None:
+        lines.append(
+            f"평균 컴백 간격: {cadence['avg_gap_days']:.0f}일, "
+            f"최근 1년 발매 {cadence['release_count_last_year']}회"
+        )
+    if prediction is not None:
+        lines.append(
+            f"예상 초동 판매량: {prediction.low:,}~{prediction.high:,}장 "
+            f"(중앙값 {prediction.mid:,}장, 신뢰도 {prediction.confidence})"
+        )
+    return "\n".join(lines)
+
+
+def call_solar_chat(
+    user_message: str,
+    context: str,
+    history: list[dict[str, str]],
+    api_key: str,
+    model: str,
+) -> str:
+    system_prompt = (
+        "너는 K-POP Comeback Radar 앱의 데이터 분석 어시스턴트야. "
+        "아래 '현재 화면 데이터'를 근거로 답하고, 데이터에 없는 건 추측이라고 명시해. "
+        "간결하고 친근한 한국어로 답해.\n\n[현재 화면 데이터]\n" + context
+    )
+    messages = [{"role": "system", "content": system_prompt}]
+    messages.extend(history[-6:])  # 최근 6턴만 유지 (토큰 절약)
+    messages.append({"role": "user", "content": user_message})
+    return _post_solar(messages, api_key, model)
+
+
+def _post_solar(messages: list[dict[str, str]], api_key: str, model: str) -> str:
+    try:
+        response = requests.post(
+            SOLAR_CHAT_API_URL,
+            headers={"Authorization": f"Bearer {api_key}", "Content-Type": "application/json"},
+            json={"model": model, "messages": messages, "temperature": 0.4},
+            timeout=30,
+        )
+        response.raise_for_status()
+        data = response.json()
+        return data["choices"][0]["message"]["content"]
+    except requests.exceptions.RequestException as exc:
+        raise RuntimeError(f"Solar API 요청 실패: {exc}") from exc
+    except (KeyError, IndexError) as exc:
+        raise RuntimeError(f"Solar 응답 파싱 실패: {exc}") from exc
+
+
+# =========================================================
 # 8. DEMO DATA
 # =========================================================
 
@@ -740,7 +810,7 @@ def render_sales_prediction_section(
     youtube_data: list[dict[str, Any]],
     news_score_avg: float,
     components: dict[str, float],
-) -> None:
+) -> SalesPrediction:
     verified_records = get_sales_records(artist_id)
     chart_history = get_chart_history(artist_id)
 
@@ -832,6 +902,8 @@ def render_sales_prediction_section(
         )
         custom_revenue = estimate_revenue_band(prediction, custom_assumptions)
         st.write(f"조정된 예상 수익(중앙값): **₩{custom_revenue['mid']['total_krw']:,}**")
+
+    return prediction
 
 
 # =========================================================
@@ -1104,7 +1176,7 @@ render_cadence_section(cadence)
 st.markdown("---")
 st.markdown('<div class="section-title">💿 판매량 · 수익 예측</div>', unsafe_allow_html=True)
 news_avg = (components.get("글로벌 뉴스", 0) + components.get("국내 뉴스", 0)) / 2
-render_sales_prediction_section(selected_key, apple_data, youtube_data, news_avg, components)
+sales_prediction = render_sales_prediction_section(selected_key, apple_data, youtube_data, news_avg, components)
 
 
 # =========================================================
@@ -1120,6 +1192,55 @@ with global_tab:
 with korean_tab:
     st.caption("네이버 검색 API를 통해 수집한 국내 최신 기사입니다.")
     render_news_cards(naver_news)
+
+
+# =========================================================
+# 18b. AI 채팅 (Upstage Solar)
+# =========================================================
+
+st.markdown("---")
+st.markdown('<div class="section-title">🤖 AI 채팅 분석 (Upstage Solar)</div>', unsafe_allow_html=True)
+
+if not solar_connected:
+    st.info(
+        "Upstage Solar API 키가 연결되지 않았습니다. "
+        "사이드바 안내대로 `UPSTAGE_API_KEY`를 Secrets에 등록하면 "
+        f"**{selected_artist}**의 지금 화면 데이터를 근거로 질문에 답하는 채팅이 활성화됩니다."
+    )
+else:
+    session_key = f"solar_chat_{selected_key}"
+    if session_key not in st.session_state:
+        st.session_state[session_key] = []
+
+    for turn in st.session_state[session_key]:
+        with st.chat_message(turn["role"]):
+            st.markdown(turn["content"])
+
+    user_input = st.chat_input(f"{selected_artist}에 대해 물어보세요 (예: 지금 컴백 신호 어때?)")
+    if user_input:
+        st.session_state[session_key].append({"role": "user", "content": user_input})
+        with st.chat_message("user"):
+            st.markdown(user_input)
+
+        context = build_artist_context(
+            selected_artist, apple_data, score, components, cadence, sales_prediction,
+        )
+        with st.chat_message("assistant"):
+            with st.spinner("Solar가 데이터를 분석하는 중..."):
+                try:
+                    answer = call_solar_chat(
+                        user_input, context, st.session_state[session_key],
+                        solar_api_key, solar_model,
+                    )
+                except RuntimeError as error:
+                    answer = f"⚠️ 응답을 가져오지 못했어요: {error}"
+            st.markdown(answer)
+        st.session_state[session_key].append({"role": "assistant", "content": answer})
+
+    if st.session_state[session_key]:
+        if st.button("대화 초기화", key=f"reset_{selected_key}"):
+            st.session_state[session_key] = []
+            st.rerun()
 
 
 # =========================================================

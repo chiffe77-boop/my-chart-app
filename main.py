@@ -72,17 +72,21 @@ st.markdown(
     """
     <style>
         :root {
-            --bg: #0b0b0f;
-            --card: #16161d;
-            --card-border: rgba(255,255,255,.08);
-            --ink: #f2f2f5;
-            --muted: #8c8c99;
+            --bg: #ffffff;
+            --card: #ffffff;
+            --card-border: rgba(17,17,20,.10);
+            --ink: #111114;
+            --muted: #5a5a63;
             --accent1: #ff2d55;
             --accent2: #ff5f8f;
             --accent3: #ffaa00;
             --spotify: #1db954;
             --sidebar-bg: #f5f5f7;
             --sidebar-ink: #111114;
+            --purple1: #2d0a54;
+            --purple2: #5a189a;
+            --hero-ink: #ffffff;
+            --hero-muted: rgba(255,255,255,.78);
         }
 
         html, body, [class*="css"] {
@@ -93,9 +97,8 @@ st.markdown(
 
         .stApp {
             background:
-                radial-gradient(circle at 12% 0%, rgba(255,45,85,.22), transparent 34%),
-                radial-gradient(circle at 88% 6%, rgba(255,170,0,.18), transparent 32%),
-                radial-gradient(circle at 50% 100%, rgba(255,95,143,.10), transparent 40%),
+                radial-gradient(circle at 12% 0%, rgba(255,45,85,.05), transparent 34%),
+                radial-gradient(circle at 88% 6%, rgba(255,170,0,.05), transparent 32%),
                 var(--bg);
             color: var(--ink);
         }
@@ -139,20 +142,19 @@ st.markdown(
             50% { height: 16px; }
         }
 
+        /* ---------- 히어로: 짙은 보라 배경 유지, 텍스트는 밝은 톤 ---------- */
         .hero {
             position: relative;
             overflow: hidden;
             padding: 34px 38px;
             margin-bottom: 22px;
             border-radius: 26px;
-            border: 1px solid var(--card-border);
-            background:
-                linear-gradient(120deg, rgba(255,45,85,.28), rgba(255,170,0,.16)),
-                var(--card);
-            box-shadow: 0 0 60px rgba(255,45,85,.10);
+            border: 1px solid rgba(255,255,255,.08);
+            background: linear-gradient(120deg, var(--purple1), var(--purple2) 70%, #7b2ff7);
+            box-shadow: 0 20px 50px rgba(45,10,84,.35);
         }
         .eyebrow {
-            background: linear-gradient(90deg, #fff, var(--accent2) 60%, var(--accent3));
+            background: linear-gradient(90deg, #ffffff, var(--accent2) 55%, var(--accent3));
             -webkit-background-clip: text; -webkit-text-fill-color: transparent;
             font-size: 2.4rem; font-weight: 900; letter-spacing: -.02em;
             text-transform: uppercase; margin-bottom: 10px; line-height: 1.1;
@@ -160,9 +162,9 @@ st.markdown(
         .hero-title {
             font-size: clamp(1.05rem, 2vw, 1.8rem);
             font-weight: 800; letter-spacing: -.02em; margin: 0;
-            color: #fff;
+            color: var(--hero-ink);
         }
-        .hero-subtitle { color: var(--muted); margin-top: 12px; max-width: 820px; line-height: 1.6; }
+        .hero-subtitle { color: var(--hero-muted); margin-top: 12px; max-width: 820px; line-height: 1.6; }
 
         .section-title {
             font-size: 1.22rem; font-weight: 800; margin: 18px 0 12px;
@@ -172,76 +174,80 @@ st.markdown(
         .glass-card {
             height: 100%; padding: 20px; border-radius: 18px;
             background: var(--card); border: 1px solid var(--card-border);
+            box-shadow: 0 4px 18px rgba(17,17,20,.05);
         }
 
         .album-card {
             display: flex; gap: 18px; align-items: center; padding: 18px;
             border-radius: 18px; background: var(--card); border: 1px solid var(--card-border);
-            margin-bottom: 14px;
+            margin-bottom: 14px; box-shadow: 0 4px 18px rgba(17,17,20,.05);
         }
         .album-cover {
             width: 112px; height: 112px; min-width: 112px; border-radius: 14px;
-            object-fit: cover; background: #24242c;
-            box-shadow: 0 10px 26px rgba(0,0,0,.5);
+            object-fit: cover; background: #eeeef2;
+            box-shadow: 0 10px 26px rgba(17,17,20,.18);
         }
-        .album-name { font-size: 1.08rem; font-weight: 800; margin: 6px 0; color: #fff; }
+        .album-name { font-size: 1.08rem; font-weight: 800; margin: 6px 0; color: var(--ink); }
         .muted { color: var(--muted); font-size: .89rem; line-height: 1.55; }
 
         .score-card {
             text-align: center; padding: 26px 18px; border-radius: 20px;
-            background: radial-gradient(circle at 50% 0%, rgba(250,35,59,.22), transparent 45%), var(--card);
+            background: radial-gradient(circle at 50% 0%, rgba(255,45,85,.08), transparent 45%), var(--card);
             border: 1px solid var(--card-border);
+            box-shadow: 0 4px 18px rgba(17,17,20,.05);
         }
         .score-number {
             font-family: ui-monospace, "SF Mono", monospace;
             font-size: 3.6rem; font-weight: 800;
-            background: linear-gradient(90deg, var(--accent2), var(--accent3));
+            background: linear-gradient(90deg, var(--accent1), var(--accent3));
             -webkit-background-clip: text; -webkit-text-fill-color: transparent;
         }
 
         .news-card {
             padding: 15px 16px; margin-bottom: 10px; border-radius: 15px;
             background: var(--card); border: 1px solid var(--card-border);
+            box-shadow: 0 4px 18px rgba(17,17,20,.05);
         }
-        .news-title { color: #fff; font-weight: 700; font-size: .95rem; text-decoration: none; }
-        .news-title:hover { color: var(--accent2); }
+        .news-title { color: var(--ink); font-weight: 700; font-size: .95rem; text-decoration: none; }
+        .news-title:hover { color: var(--accent1); }
         .news-meta { color: var(--muted); font-size: .76rem; margin-top: 7px; }
 
         .badge {
             display: inline-block; padding: 4px 10px; border-radius: 999px;
             font-size: .72rem; font-weight: 700; margin: 2px 4px 2px 0;
-            background: rgba(250,35,59,.14); border: 1px solid rgba(251,92,116,.28);
-            color: #ffd7dc;
+            background: rgba(255,45,85,.10); border: 1px solid rgba(255,45,85,.30);
+            color: #c2114a;
         }
         .badge-spotify {
-            background: rgba(29,185,84,.14); border: 1px solid rgba(29,185,84,.32); color: #b7f5cd;
+            background: rgba(29,185,84,.10); border: 1px solid rgba(29,185,84,.35); color: #17803d;
         }
         .badge-solo {
-            background: rgba(255,149,0,.14); border: 1px solid rgba(255,149,0,.32); color: #ffe0b3;
+            background: rgba(255,170,0,.14); border: 1px solid rgba(255,170,0,.40); color: #a35c00;
         }
 
         .revenue-band {
             padding: 18px; border-radius: 16px; background: var(--card);
             border: 1px solid var(--card-border); text-align: center;
+            box-shadow: 0 4px 18px rgba(17,17,20,.05);
         }
         .revenue-band .val {
             font-family: ui-monospace, "SF Mono", monospace;
-            font-size: 1.5rem; font-weight: 800; color: #fff;
+            font-size: 1.5rem; font-weight: 800; color: var(--ink);
         }
         .revenue-band .lbl { color: var(--muted); font-size: .78rem; margin-top: 4px; }
 
         .verified-tag {
             display: inline-block; padding: 3px 9px; border-radius: 8px;
-            background: rgba(29,185,84,.16); color: #7fe6a6; font-size: .72rem; font-weight: 800;
+            background: rgba(29,185,84,.14); color: #16803c; font-size: .72rem; font-weight: 800;
         }
         .estimate-tag {
             display: inline-block; padding: 3px 9px; border-radius: 8px;
-            background: rgba(255,149,0,.16); color: #ffcb80; font-size: .72rem; font-weight: 800;
+            background: rgba(255,170,0,.16); color: #a35c00; font-size: .72rem; font-weight: 800;
         }
 
         [data-testid="stSidebar"] .stButton > button {
             background: linear-gradient(90deg, var(--accent1), var(--accent3));
-            color: #fff; border: 0; border-radius: 12px; font-weight: 800;
+            color: #fff !important; border: 0; border-radius: 12px; font-weight: 800;
         }
 
         hr { border-color: var(--card-border) !important; }
@@ -683,14 +689,14 @@ def render_cadence_section(cadence: dict[str, Any]) -> None:
     with cols[0]:
         st.markdown(
             f'<div class="glass-card"><div class="muted">평균 컴백 간격</div>'
-            f'<div class="mono" style="font-size:1.8rem;font-weight:800;color:#fff;">'
+            f'<div class="mono" style="font-size:1.8rem;font-weight:800;color:#111114;">'
             f'{cadence["avg_gap_days"]:.0f}일</div></div>',
             unsafe_allow_html=True,
         )
     with cols[1]:
         st.markdown(
             f'<div class="glass-card"><div class="muted">최근 1년 발매 횟수</div>'
-            f'<div class="mono" style="font-size:1.8rem;font-weight:800;color:#fff;">'
+            f'<div class="mono" style="font-size:1.8rem;font-weight:800;color:#111114;">'
             f'{cadence["release_count_last_year"]}회</div></div>',
             unsafe_allow_html=True,
         )
@@ -698,7 +704,7 @@ def render_cadence_section(cadence: dict[str, Any]) -> None:
         fastest = cadence["min_gap_days"]
         st.markdown(
             f'<div class="glass-card"><div class="muted">최단 컴백 간격</div>'
-            f'<div class="mono" style="font-size:1.8rem;font-weight:800;color:#fff;">'
+            f'<div class="mono" style="font-size:1.8rem;font-weight:800;color:#111114;">'
             f'{fastest if fastest is not None else "-"}일</div></div>',
             unsafe_allow_html=True,
         )
@@ -712,12 +718,12 @@ def render_cadence_section(cadence: dict[str, Any]) -> None:
             [{"포맷": k, "횟수": v} for k, v in cadence["format_counts"].items()]
         ),
         x="포맷", y="횟수", color="포맷",
-        color_discrete_sequence=["#fa233b", "#fb5c74", "#ff9500", "#8c8c99"],
+        color_discrete_sequence=["#ff2d55", "#ff5f8f", "#ffaa00", "#5a5a63"],
     )
     fmt_fig.update_layout(
         height=280, margin=dict(l=10, r=10, t=20, b=10),
         paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)",
-        font=dict(color="#d9dcec"), showlegend=False,
+        font=dict(color="#2b2b33"), showlegend=False,
     )
     st.plotly_chart(fmt_fig, use_container_width=True, config={"displayModeBar": False})
     with st.expander("발매 타임라인 상세 보기"):
@@ -842,7 +848,7 @@ def render_album_card(artist_name: str, apple_data: dict[str, Any]) -> None:
     )
     link_tag = (
         f'<a href="{escape_text(apple_url)}" target="_blank" '
-        'style="color:#fb5c74;font-weight:700;">Apple Music에서 열기 ↗</a>'
+        'style="color:#ff2d55;font-weight:700;">Apple Music에서 열기 ↗</a>'
         if apple_url else ""
     )
     st.markdown(
@@ -1060,7 +1066,7 @@ with right:
         <div class="score-card">
             <div class="muted">현재 레이더 점수</div>
             <div class="score-number">{score:.0f}</div>
-            <div style="font-size:1.02rem;font-weight:800;margin-top:8px;color:#fff;">
+            <div style="font-size:1.02rem;font-weight:800;margin-top:8px;color:#111114;">
                 {escape_text(score_label(score))}
             </div>
         </div>
@@ -1069,14 +1075,14 @@ with right:
     )
     radar_df = pd.DataFrame({"지표": list(components.keys()), "점수": list(components.values())})
     radar_fig = px.line_polar(radar_df, r="점수", theta="지표", line_close=True, range_r=[0, 100])
-    radar_fig.update_traces(fill="toself", line=dict(color="#fb5c74"))
+    radar_fig.update_traces(fill="toself", line=dict(color="#ff2d55"))
     radar_fig.update_layout(
         height=300, margin=dict(l=15, r=15, t=25, b=15),
         paper_bgcolor="rgba(0,0,0,0)",
-        polar=dict(bgcolor="rgba(255,255,255,.03)",
-                   radialaxis=dict(visible=True, range=[0, 100], gridcolor="rgba(255,255,255,.10)"),
-                   angularaxis=dict(gridcolor="rgba(255,255,255,.10)", tickfont=dict(size=10))),
-        showlegend=False, font=dict(color="#d9dcec"),
+        polar=dict(bgcolor="rgba(17,17,20,.02)",
+                   radialaxis=dict(visible=True, range=[0, 100], gridcolor="rgba(17,17,20,.12)"),
+                   angularaxis=dict(gridcolor="rgba(17,17,20,.12)", tickfont=dict(size=10))),
+        showlegend=False, font=dict(color="#2b2b33"),
     )
     st.plotly_chart(radar_fig, use_container_width=True, config={"displayModeBar": False})
 

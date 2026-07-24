@@ -23,7 +23,12 @@ import streamlit as st
 
 from artists_data import ARTISTS, get_display_options
 from seed_sales import get_sales_records, has_verified_data
-from spotify_charts import get_chart_history, has_chart_data
+from spotify_charts import (
+    get_chart_history,
+    has_chart_data,
+    get_artist_yearly_history,
+    has_artist_yearly_data,
+)
 from prediction_model import (
     SignalInputs,
     SalesPrediction,
@@ -886,6 +891,32 @@ def render_sales_prediction_section(
         ])
         st.dataframe(chart_df, use_container_width=True, hide_index=True)
         st.caption("⚠️ 이 데이터셋엔 한국(kr) 리전이 포함돼 있지 않아 글로벌 리전 기준입니다.")
+
+    yearly_history = get_artist_yearly_history(artist_id)
+    if yearly_history:
+        st.markdown("#### 📊 연도별 글로벌 인기도 추이 (Spotify 실측)")
+        yearly_df = pd.DataFrame([
+            {
+                "연도": r["year"], "최고 순위": r["best_rank"],
+                "평균 순위": r["avg_rank"], "차트 체류일": r["days_on_chart"],
+            }
+            for r in yearly_history
+        ])
+        trend_fig = px.line(
+            yearly_df, x="연도", y=["최고 순위", "평균 순위"],
+            markers=True, color_discrete_sequence=["#4b3cff", "#ff5a36"],
+        )
+        trend_fig.update_yaxes(autorange="reversed", title="순위 (낮을수록 좋음)")
+        trend_fig.update_layout(
+            height=260, margin=dict(l=10, r=10, t=20, b=10),
+            paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)",
+            font=dict(color="#14141a"), legend_title_text="",
+        )
+        st.plotly_chart(trend_fig, use_container_width=True, config={"displayModeBar": False})
+        st.caption(
+            "차트 체류일이 짧은 연도는 신곡/컴백이 드물었거나 활동 공백기였을 가능성을 시사합니다 "
+            "(예: 군백기, 재계약 이슈 등 — 실제 원인은 뉴스로 별도 확인 필요)."
+        )
 
     days_gap = days_since(apple_data.get("latest_album", {}).get("release_date"))
     signals = SignalInputs(
